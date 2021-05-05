@@ -1,8 +1,10 @@
 package cn.codingcrea.nccommunity;
 
 import cn.codingcrea.nccommunity.dao.DiscussPostMapper;
+import cn.codingcrea.nccommunity.dao.LoginTicketMapper;
 import cn.codingcrea.nccommunity.dao.UserMapper;
 import cn.codingcrea.nccommunity.entity.DiscussPost;
+import cn.codingcrea.nccommunity.entity.LoginTicket;
 import cn.codingcrea.nccommunity.entity.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +26,9 @@ public class MaperTest {
 
     @Autowired
     DiscussPostMapper discussPostMapper;
+
+    @Autowired
+    LoginTicketMapper loginTicketMapper;
 
     @Test
     public void testSelectUser() {
@@ -70,5 +75,25 @@ public class MaperTest {
         System.out.println(discussPosts);
 
         System.out.println(discussPostMapper.selectDiscussPostRows(0));
+    }
+
+    @Test
+    public void testInsertLoginTicket() {
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(101);
+        loginTicket.setTicket("abc");
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 5));   //5分钟
+
+        loginTicketMapper.insertLoginTicket(loginTicket);
+    }
+
+    @Test
+    public void testSelectAndUpdateLoginTicket() {
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
+        loginTicketMapper.updateStatus("abc", 1);
+        loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
     }
 }

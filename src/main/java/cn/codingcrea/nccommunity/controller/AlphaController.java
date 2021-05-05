@@ -1,14 +1,18 @@
 package cn.codingcrea.nccommunity.controller;
 
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
@@ -72,5 +76,42 @@ public class AlphaController {
         map.put("name","USTC");
         map.put("where","jiangsu");
         return map; //自动转为json
+    }
+
+    //cookie测试
+    @RequestMapping("/setcookie")
+    @ResponseBody
+    public String setCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("testCookieCode", "123123");
+        cookie.setPath("/nccommunity/alpha");
+        //生存时间，负数为临时性，即只在浏览器内存中，关闭就失效；0表示立刻失效，可配合add方法删除cookie
+        cookie.setMaxAge(60 * 60);
+        response.addCookie(cookie);
+        return "set cookie";
+    }
+
+    @RequestMapping("/getcookie")
+    @ResponseBody
+    public String getCookie(@CookieValue("testCookieCode") String testCookieCode) {
+        System.out.println(testCookieCode);
+        return "get cookie";
+    }
+
+    @RequestMapping("/setsession")
+    @ResponseBody
+    //Session同MaV一样，可以声明并自动注入
+    public String setSession(HttpSession session) {
+        session.setAttribute("id", 123);
+        session.setAttribute("name", "test");
+        return "set session";
+    }
+
+    @RequestMapping("/getsession")
+    @ResponseBody
+    //Session同MaV一样，可以声明并自动注入
+    public String getSession(HttpSession session) {
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+        return "get session";
     }
 }

@@ -29,7 +29,8 @@
         from user
         where email = #{email}
    </select>
-    
+
+<!--    自增的字段是"id"，别忘了注明-->
     <insert id="insertUser" parameterType="User" keyProperty="id">
         insert into user (<include refid="insertFields"></include>)
         values(#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl},
