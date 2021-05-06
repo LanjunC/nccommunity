@@ -30,7 +30,7 @@
         where email = #{email}
    </select>
 
-<!--    自增的字段是"id"，别忘了注明-->
+<!--    自增的字段是pojo"id"，可用于pojo的id属性回填-->
     <insert id="insertUser" parameterType="User" keyProperty="id">
         insert into user (<include refid="insertFields"></include>)
         values(#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl},

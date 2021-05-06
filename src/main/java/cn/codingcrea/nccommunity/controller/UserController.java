@@ -101,7 +101,7 @@ public class UserController {
 
         filename = uploadPath + "/" + filename;        //服务器实际存放头像位置
         String suffix = filename.substring(filename.lastIndexOf(".") + 1);
-        System.out.println(suffix);
+//        System.out.println(suffix);
 
         //注意这里只能用传统的文件io方法而不能用验证码的ImageIO.write(image,"png",os);因为第一个参数类型不满足
         response.setContentType("image/" + suffix);

@@ -2,9 +2,11 @@ package cn.codingcrea.nccommunity;
 
 import cn.codingcrea.nccommunity.dao.DiscussPostMapper;
 import cn.codingcrea.nccommunity.dao.LoginTicketMapper;
+import cn.codingcrea.nccommunity.dao.MessageMapper;
 import cn.codingcrea.nccommunity.dao.UserMapper;
 import cn.codingcrea.nccommunity.entity.DiscussPost;
 import cn.codingcrea.nccommunity.entity.LoginTicket;
+import cn.codingcrea.nccommunity.entity.Message;
 import cn.codingcrea.nccommunity.entity.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,13 +24,16 @@ import java.util.List;
 public class MaperTest {
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    DiscussPostMapper discussPostMapper;
+    private DiscussPostMapper discussPostMapper;
 
     @Autowired
-    LoginTicketMapper loginTicketMapper;
+    private LoginTicketMapper loginTicketMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Test
     public void testSelectUser() {
@@ -95,5 +100,27 @@ public class MaperTest {
         loginTicketMapper.updateStatus("abc", 1);
         loginTicket = loginTicketMapper.selectByTicket("abc");
         System.out.println(loginTicket);
+    }
+
+    @Test
+    public void testSelectLetters() {
+        List<Message> messages = messageMapper.selectConversations(111, 0, 20);
+        for(Message message : messages) {
+            System.out.println(message);
+        }
+
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+
+        List<Message> messagesOf111 = messageMapper.selectLetters("111_112", 0, 20);
+        for(Message message : messagesOf111) {
+            System.out.println(message);
+        }
+
+        count = messageMapper.selectLetterCount("111_112");
+        System.out.println(count);
+
+        count = messageMapper.selectLetterUnreadCount(131, "111_131");
+        System.out.println(count);
     }
 }

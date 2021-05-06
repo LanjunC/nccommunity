@@ -1,5 +1,6 @@
 package cn.codingcrea.nccommunity.controller;
 
+import cn.codingcrea.nccommunity.util.NcCommunityUtil;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -114,4 +115,5 @@ public class AlphaController {
         System.out.println(session.getAttribute("name"));
         return "get session";
     }
+
 }
