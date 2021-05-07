@@ -17,9 +17,12 @@ public interface CommunityConstant {
     //“记住我”时的凭证超时时间
     int REMEMBERME_EXPIRED_SECONDS = 3600 * 24 * 100;
 
-    //comment的entityType为帖子
+    //实体类型为帖子
     int ENTITY_TYPE_POST = 1;
 
-    //comment的entityType为comment
+    //实体类型为为comment
     int ENTITY_TYPE_COMMENT = 2;
+
+    //实体类型为用户
+    int ENTITY_TYPE_USER = 3;
 }

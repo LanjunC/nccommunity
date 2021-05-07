@@ -4,6 +4,7 @@ import cn.codingcrea.nccommunity.entity.LoginTicket;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
+@Deprecated
 public interface LoginTicketMapper {
 
     //注解的方式写sql
