@@ -33,8 +33,8 @@
         </if>
     </select>
 
-<!--    keyProperty不需要，这个字段是用于回填的-->
-    <insert id="insertDiscussPost" parameterType="DiscussPost">
+<!--    keyProperty字段是用于回填的-->
+    <insert id="insertDiscussPost" parameterType="DiscussPost" keyProperty="id">
         insert into discuss_post(<include refid="insertFields"></include>)
         values (#{userId},#{title},#{content},#{type},#{status},#{createTime},#{commentCount},#{score})
     </insert>

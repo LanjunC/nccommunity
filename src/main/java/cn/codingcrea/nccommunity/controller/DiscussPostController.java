@@ -1,9 +1,7 @@
 package cn.codingcrea.nccommunity.controller;
 
-import cn.codingcrea.nccommunity.entity.Comment;
-import cn.codingcrea.nccommunity.entity.DiscussPost;
-import cn.codingcrea.nccommunity.entity.Page;
-import cn.codingcrea.nccommunity.entity.User;
+import cn.codingcrea.nccommunity.entity.*;
+import cn.codingcrea.nccommunity.event.EventProducer;
 import cn.codingcrea.nccommunity.service.CommentService;
 import cn.codingcrea.nccommunity.service.DiscussPostService;
 import cn.codingcrea.nccommunity.service.LikeService;
@@ -40,6 +38,9 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private LikeService likeService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path = "/add", method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title, String content) {
@@ -57,6 +58,15 @@ public class DiscussPostController implements CommunityConstant {
         discussPost.setCreateTime(new Date());
         //type和status默认0
         discussPostService.addDiscussPost(discussPost);
+
+        //触发发帖事件,post存到es服务器里，交给kafka来异步实现
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(user.getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(discussPost.getId());
+
+        eventProducer.fireEvent(event);
 
         return NcCommunityUtil.getJSONString(0, "发布成功！");
     }

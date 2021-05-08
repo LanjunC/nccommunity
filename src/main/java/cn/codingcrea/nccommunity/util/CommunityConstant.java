@@ -42,6 +42,11 @@ public interface CommunityConstant {
     String TOPIC_FOLLOW = "follow";
 
     /**
+     * topic:发帖
+     */
+    String TOPIC_PUBLISH = "publish";
+
+    /**
      * 系统在消息系统中使用的用户ID
      */
     int SYSTEM_USER_ID = 1;
