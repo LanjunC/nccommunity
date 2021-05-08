@@ -1,8 +1,10 @@
 package cn.codingcrea.nccommunity.controller;
 
 
+import cn.codingcrea.nccommunity.entity.Event;
 import cn.codingcrea.nccommunity.entity.Page;
 import cn.codingcrea.nccommunity.entity.User;
+import cn.codingcrea.nccommunity.event.EventProducer;
 import cn.codingcrea.nccommunity.service.FollowService;
 import cn.codingcrea.nccommunity.service.UserService;
 import cn.codingcrea.nccommunity.util.CommunityConstant;
@@ -31,12 +33,25 @@ public class FollowController implements CommunityConstant {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
     @ResponseBody
     public String follow(int entityType, int entityId) {
         User user = hostHolder.getUser();
 
         followService.follow(user.getId(), entityType, entityId);
+
+        //触发关注事件
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                //目前只有关注用户的功能
+                .setEntityUserId(entityId);
+        eventProducer.fireEvent(event);
 
         return NcCommunityUtil.getJSONString(0, "已关注!");
     }

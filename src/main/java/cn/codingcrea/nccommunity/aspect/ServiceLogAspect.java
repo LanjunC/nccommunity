@@ -31,6 +31,10 @@ public class ServiceLogAspect {
 
         //由于不能用request，只能用下面的方法
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        //由于程序有通过消费者调用service而不是通过controller，所以会造成这里空指针，特殊处理即可
+        if(requestAttributes == null) {
+            return;
+        }
         HttpServletRequest request = requestAttributes.getRequest();
         String ip = request.getRemoteHost();
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
