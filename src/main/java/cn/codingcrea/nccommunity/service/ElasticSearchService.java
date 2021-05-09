@@ -33,8 +33,8 @@ public class ElasticSearchService {
         discussPostRepository.save(post);
     }
 
-    public void deleteDiscussPost(DiscussPost post) {
-        discussPostRepository.delete(post);
+    public void deleteDiscussPost(int id) {
+        discussPostRepository.deleteById(id);
     }
 
     public Map<String, Object> searchDiscussPost(String keyword,int current, int limit) {
