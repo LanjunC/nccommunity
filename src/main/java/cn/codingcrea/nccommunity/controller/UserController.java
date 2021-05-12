@@ -8,6 +8,8 @@ import cn.codingcrea.nccommunity.service.UserService;
 import cn.codingcrea.nccommunity.util.CommunityConstant;
 import cn.codingcrea.nccommunity.util.HostHolder;
 import cn.codingcrea.nccommunity.util.NcCommunityUtil;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +26,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 @Controller
 @RequestMapping("/user")
@@ -56,6 +55,21 @@ public class UserController implements CommunityConstant {
     @Autowired
     private FollowService followService;
 
+    @Value("${aliyun.oss.file.endpoint}")
+    private String endpoint;
+
+    @Value("${aliyun.oss.file.keyid}")
+    private String keyid;
+
+    @Value("${aliyun.oss.file.secretid}")
+    private String secretid;
+
+    @Value("${aliyun.oss.file.bucket.name}")
+    private String bucket;
+
+    @Value("${aliyun.oss.file.bucket.dir}")
+    private String dirName;
+
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
     public String getSettingPage() {
@@ -63,14 +77,14 @@ public class UserController implements CommunityConstant {
     }
 
     /**
-     * 更新头像
+     * 更新头像(本地，已废弃)
      * @param headerimage mvc框架提供的API
      * @param model
      * @return
      */
     @LoginRequired
-    @RequestMapping(path = "upload",method = RequestMethod.POST)
-    public String uploadHeader(MultipartFile headerimage, Model model) {
+    @RequestMapping(path = "/upload",method = RequestMethod.POST)
+    public String uploadHeaderLocal(MultipartFile headerimage, Model model) {
         if(headerimage == null) {
             model.addAttribute("error", "您未选择图片！");
             return "/site/setting";
@@ -105,7 +119,61 @@ public class UserController implements CommunityConstant {
         return "redirect:/index";
     }
 
-    @RequestMapping(path = "/header/{filename}",method = RequestMethod.GET)
+    /**
+     * 更新头像到Oss
+     * @param headerimage
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/uploadoss", method = RequestMethod.POST)
+    public String uploadHeaderOss(MultipartFile headerimage, Model model) {
+        if(headerimage == null) {
+            model.addAttribute("error", "您未选择图片！");
+            return "/site/setting";
+        }
+
+
+        String filename = headerimage.getOriginalFilename();
+        String suffix = filename.substring(filename.lastIndexOf("."));  //.png等后缀
+        if(StringUtils.isBlank(suffix)) {
+            model.addAttribute("error", "文件格式不正确！");
+            return "/site/setting";
+        }
+
+        //生成随机访问url
+        filename = NcCommunityUtil.generateUUID() + suffix;
+
+        //文件名加上头像所在文件夹名
+        filename = dirName + "/" + filename;
+
+        //上传头像
+        OSS ossClient = new OSSClientBuilder().build(endpoint, keyid, secretid);
+        try(
+                InputStream is = headerimage.getInputStream();
+                ) {
+            ossClient.putObject(bucket, filename, is);
+            ossClient.shutdown();
+        } catch (IOException e) {
+            logger.error("上传文件失败:" + e.getMessage());
+            throw new RuntimeException("上传文件失败，服务器异常！", e);
+        }
+
+        //更新headerUrl(web访问路径)
+        //文件位置(web访问路径)http://${bucket}.oss-cn-shanghai.aliyuncs.com/${dirName}/${filename}
+        User user = hostHolder.getUser();
+        String headerUrl = "http://" + bucket + "." + endpoint + "/" + filename;        //服务器实际存放头像位置
+        userService.updateHeader(user.getId(), headerUrl);
+
+        return "redirect:/index";
+    }
+
+
+    /**
+     * 访问本地头像（废弃）
+     * @param filename
+     * @param response
+     */
+    @RequestMapping(path = "/headerlocal/{filename}",method = RequestMethod.GET)
     public void getHeader(@PathVariable("filename") String filename, HttpServletResponse response) {
 
         filename = uploadPath + "/" + filename;        //服务器实际存放头像位置
@@ -127,6 +195,8 @@ public class UserController implements CommunityConstant {
             logger.error("读取头像失败:" + e.getMessage());
         }
     }
+
+
 
     @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
     public String getProfilePage(@PathVariable("userId") int userId, Model model) {

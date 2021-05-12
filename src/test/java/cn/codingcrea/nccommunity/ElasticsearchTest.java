@@ -49,7 +49,7 @@ public class ElasticsearchTest {
     @Test
     public void testInsertList() {
         for(int uid = 0; uid < 160; uid++) {
-            discussPostRepository.saveAll(discussPostMapper.selectDiscussPosts(uid, 0, 200));
+            discussPostRepository.saveAll(discussPostMapper.selectDiscussPosts(uid, 0, 200, 0));
         }
     }
 

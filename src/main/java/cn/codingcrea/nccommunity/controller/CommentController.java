@@ -8,7 +8,9 @@ import cn.codingcrea.nccommunity.service.CommentService;
 import cn.codingcrea.nccommunity.service.DiscussPostService;
 import cn.codingcrea.nccommunity.util.CommunityConstant;
 import cn.codingcrea.nccommunity.util.HostHolder;
+import cn.codingcrea.nccommunity.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,9 @@ public class CommentController implements CommunityConstant {
 
     @Autowired
     private DiscussPostService discussPostService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //发布评论后还希望回到当前帖
     @RequestMapping(path = "/add/{discussPostId}", method = RequestMethod.POST)
@@ -66,6 +71,10 @@ public class CommentController implements CommunityConstant {
                     .setEntityType(ENTITY_TYPE_POST)
                     .setEntityId(discussPostId);
             eventProducer.fireEvent(event);
+
+            //对帖子评论，需要算分
+            String redisKey = RedisKeyUtil.getPostScoreKey();
+            redisTemplate.opsForSet().add(redisKey,discussPostId);
         }
 
         return "redirect:/discuss/detail/" + discussPostId;
