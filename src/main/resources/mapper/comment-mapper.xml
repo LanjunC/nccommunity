@@ -26,7 +26,7 @@
     </select>
     
     <insert id="insertComment" parameterType="Comment">
-        insert into Comment(<include refid="insertFields"></include>)
+        insert into comment(<include refid="insertFields"></include>)
         values(#{userId},#{entityType},#{entityId},#{targetId},#{content},#{status},#{createTime})
     </insert>
     

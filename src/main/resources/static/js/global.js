@@ -1,4 +1,5 @@
-var CONTEXT_PATH = "/nccommunity";
+// var CONTEXT_PATH = "/nccommunity";
+var CONTEXT_PATH = "";
 
 window.alert = function(message) {
 	if(!$(".alert-box").length) {
