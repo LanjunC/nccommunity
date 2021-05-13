@@ -120,7 +120,8 @@ public class UserController implements CommunityConstant {
     }
 
     /**
-     * 更新头像到Oss
+     * 更新头像到Oss,https://blog.csdn.net/z1c5809145294zv/article/details/
+     * 106674169?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-1&spm=1001.2101.3001.4242
      * @param headerimage
      * @param model
      * @return
